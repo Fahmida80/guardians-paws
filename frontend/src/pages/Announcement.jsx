@@ -28,6 +28,7 @@ const AnnouncementPage = () => {
   useEffect(() => {
     // window.scrollTo(0, 0);
     fetchAnnouncements();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addAnnouncement = async () => {

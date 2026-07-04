@@ -27,10 +27,9 @@ const Gallery = () => {
   };
 
   useEffect(() => {
-    // window.scrollTo(0, 0);
     fetchAnimals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this animal?')) {
       setDeletingId(id);
