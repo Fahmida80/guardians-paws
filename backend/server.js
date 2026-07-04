@@ -12,11 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:3000',
-      'https://guardians-paws-nbcoeh8kx-fahmida80s-projects.vercel.app',
-      'https://wls-lilac.vercel.app'
-    ],
+    origin: '*',
     methods: ["GET", "POST"],
   },
 });
@@ -24,11 +20,7 @@ const io = new Server(server, {
 // Middleware
 // app.use(cors());
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://guardians-paws-nbcoeh8kx-fahmida80s-projects.vercel.app',
-    'https://wls-lilac.vercel.app'
-  ],
+  origin: '*',
   credentials: true,
 }));
 app.use(express.json());
