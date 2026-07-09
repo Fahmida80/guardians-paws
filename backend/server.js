@@ -12,15 +12,28 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'https://www.gpcbd.org',
+      'https://gpcbd.org',
+      'https://guardians-paws-lilac.vercel.app'
+    ],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 // Middleware
 // app.use(cors());
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'https://www.gpcbd.org',
+    'https://gpcbd.org',
+    'https://guardians-paws-lilac.vercel.app'
+  ],
   credentials: true,
 }));
 app.use(express.json());
