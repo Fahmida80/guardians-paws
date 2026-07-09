@@ -52,6 +52,14 @@ const Gallery = () => {
     );
   }
 
+  // Helper to check if it's a video
+  const isVideo = (animal) => {
+    return animal.mediaType === 'video' || 
+           animal.imageUrl?.includes('.mp4') || 
+           animal.imageUrl?.includes('.webm') ||
+           animal.imageUrl?.includes('video');
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 py-12 pt-24">
 
@@ -117,112 +125,130 @@ const Gallery = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {animals.map((animal) => (
-            <div
-              key={animal._id}
-              className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-navy-100 hover:border-navy-300 overflow-hidden transform hover:-translate-y-1"
-            >
-              {/* Media Container */}
-              <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-gradient-to-br from-navy-50 to-sky-50">
-                {animal.mediaType === 'video' ? (
-                  <video
-                    src={animal.imageUrl}
-                    controls
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                ) : (
-                  <img
-                    src={animal.imageUrl}
-                    alt={animal.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    onError={(e) => {
-                      e.target.src = 'https://placehold.co/400x400?text=🐾+No+Image';
-                    }}
-                  />
-                )}
+          {animals.map((animal) => {
+            const isVideoMedia = isVideo(animal);
+            return (
+              <div
+                key={animal._id}
+                className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-navy-100 hover:border-navy-300 overflow-hidden transform hover:-translate-y-1"
+              >
+                {/* Media Container */}
+                <div className={`relative h-48 sm:h-56 md:h-64 overflow-hidden ${
+                  isVideoMedia 
+                    ? 'bg-gradient-to-br from-purple-900/20 to-navy-900/20' 
+                    : 'bg-gradient-to-br from-navy-50 to-sky-50'
+                }`}>
+                  
+                  {isVideoMedia ? (
+                    <>
+                      <video
+                        src={animal.imageUrl}
+                        controls
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        poster="https://placehold.co/400x400/1a237e/ffffff?text=🎬+Video"
+                      />
+                      {/* Video Play Icon Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="bg-black/50 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-xl transform group-hover:scale-110 transition-all duration-300">
+                          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <img
+                      src={animal.imageUrl}
+                      alt={animal.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      onError={(e) => {
+                        e.target.src = 'https://placehold.co/400x400?text=🐾+No+Image';
+                      }}
+                    />
+                  )}
 
-                {/* Video Play Icon Overlay */}
-                {animal.mediaType === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="bg-black/50 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-xl transform group-hover:scale-110 transition-all duration-300">
-                      <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
+                  {/* Media Type Badge - Different for Video vs Image */}
+                  <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                    <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-sm shadow-md ${
+                      isVideoMedia 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-sky-500 text-white'
+                    }`}>
+                      {isVideoMedia ? '🎬 Video' : '📸 Photo'}
+                    </span>
                   </div>
-                )}
 
-                {/* Media Type Badge */}
-                <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
-                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-sm ${
-                    animal.mediaType === 'video' 
-                      ? 'bg-purple-500 text-white' 
-                      : 'bg-sky-500 text-white'
-                  }`}>
-                    {animal.mediaType === 'video' ? '🎬 Video' : '📸 Photo'}
-                  </span>
-                </div>
+                  {/* Status Badge */}
+                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
+                    <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold shadow-md backdrop-blur-sm ${
+                      animal.status === 'adopted' 
+                        ? 'bg-green-500 text-white' 
+                        : animal.status === 'medical_need'
+                        ? 'bg-red-500 text-white animate-pulse'
+                        : 'bg-navy-700 text-white'
+                    }`}>
+                      {animal.status === 'adopted' ? '✅ Adopted' : 
+                       animal.status === 'medical_need' ? '🏥 Medical' : 
+                       '❤️ In Care'}
+                    </span>
+                  </div>
 
-                {/* Status Badge */}
-                <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
-                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold shadow-md backdrop-blur-sm ${
-                    animal.status === 'adopted' 
-                      ? 'bg-green-500 text-white' 
-                      : animal.status === 'medical_need'
-                      ? 'bg-red-500 text-white animate-pulse'
-                      : 'bg-navy-700 text-white'
-                  }`}>
-                    {animal.status === 'adopted' ? '✅ Adopted' : 
-                     animal.status === 'medical_need' ? '🏥 Medical' : 
-                     '❤️ In Care'}
-                  </span>
-                </div>
+                  {/* Type Badge */}
+                  <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3">
+                    <span className="bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold text-navy-700 shadow-md">
+                      {animal.type === 'dog' ? '🐕 Dog' : animal.type === 'cat' ? '🐈 Cat' : '🐾 Other'}
+                    </span>
+                  </div>
 
-                {/* Type Badge */}
-                <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3">
-                  <span className="bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold text-navy-700 shadow-md">
-                    {animal.type === 'dog' ? '🐕 Dog' : animal.type === 'cat' ? '🐈 Cat' : '🐾 Other'}
-                  </span>
-                </div>
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-
-              {/* Content */}
-              <div className="p-4 sm:p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-navy-700 group-hover:text-sky-600 transition-colors duration-300">
-                    {animal.name}
-                  </h3>
-                  {isAuthenticated && isAdmin && (
-                    <button
-                      onClick={() => handleDelete(animal._id)}
-                      disabled={deletingId === animal._id}
-                      className="p-1.5 rounded-lg text-navy-300 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group-hover:opacity-100 opacity-0"
-                      title="Delete"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6"/>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        <line x1="10" y1="11" x2="10" y2="17"/>
-                        <line x1="14" y1="11" x2="14" y2="17"/>
-                      </svg>
-                    </button>
+                  {/* Video Duration Badge (Optional - shows if video) */}
+                  {isVideoMedia && (
+                    <div className="absolute bottom-2 sm:bottom-3 right-2 sm:right-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-black/60 text-white backdrop-blur-sm">
+                        ▶ Play
+                      </span>
+                    </div>
                   )}
                 </div>
-                <p className="text-navy-500 text-xs sm:text-sm leading-relaxed mt-1 line-clamp-2 sm:line-clamp-3">
-                  {animal.story}
-                </p>
-                <div className="mt-3 pt-3 border-t border-navy-100 flex items-center justify-between text-[10px] sm:text-xs text-navy-400">
-                  <span className="flex items-center gap-1">
-                    <span>🐾</span> Rescued with love
-                  </span>
-                  <span>{new Date(animal.createdAt).toLocaleDateString('en-BD')}</span>
+
+                {/* Content */}
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-base sm:text-lg md:text-xl font-bold text-navy-700 group-hover:text-sky-600 transition-colors duration-300">
+                      {animal.name}
+                    </h3>
+                    {isAuthenticated && isAdmin && (
+                      <button
+                        onClick={() => handleDelete(animal._id)}
+                        disabled={deletingId === animal._id}
+                        className="p-1.5 rounded-lg text-navy-300 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group-hover:opacity-100 opacity-0"
+                        title="Delete"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                          <line x1="10" y1="11" x2="10" y2="17"/>
+                          <line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-navy-500 text-xs sm:text-sm leading-relaxed mt-1 line-clamp-2 sm:line-clamp-3">
+                    {animal.story}
+                  </p>
+                  <div className="mt-3 pt-3 border-t border-navy-100 flex items-center justify-between text-[10px] sm:text-xs text-navy-400">
+                    <span className="flex items-center gap-1">
+                      {isVideoMedia ? '🎬' : '🐾'} 
+                      {isVideoMedia ? ' Watch their story' : ' Rescued with love'}
+                    </span>
+                    <span>{new Date(animal.createdAt).toLocaleDateString('en-BD')}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
