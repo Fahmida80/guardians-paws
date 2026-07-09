@@ -18,6 +18,11 @@ const animalSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  mediaType: {              // ← ADD THIS
+    type: String,
+    enum: ['image', 'video'],
+    default: 'image',
+  },
   status: {
     type: String,
     enum: ['in_care', 'adopted', 'medical_need'],
