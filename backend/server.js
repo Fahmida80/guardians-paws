@@ -10,34 +10,14 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'https://www.gpcbd.org',
-  'https://gpcbd.org',
-  'https://guardians-paws-lilac.vercel.app'
-];
-
-// ===== CORS CONFIGURATION =====
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
-
-// Manual CORS headers (backup for preflight)
+// ===== NUCLEAR CORS (ALLOW EVERYTHING FOR TESTING) =====
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
@@ -47,7 +27,7 @@ app.use((req, res, next) => {
 // ===== SOCKET.IO =====
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: '*',
     methods: ["GET", "POST"],
     credentials: true,
   },
