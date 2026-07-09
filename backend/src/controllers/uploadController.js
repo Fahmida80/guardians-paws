@@ -1,24 +1,42 @@
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
-// Upload single image to Cloudinary
-const uploadImage = async (req, res) => {
+// Upload image/video to Cloudinary
+const uploadMedia = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
 
-    // Upload to Cloudinary using stream
+    console.log('File size:', req.file.size);
+    console.log('File type:', req.file.mimetype);
+
+    // Determine resource type based on file mimetype
+    let resourceType = 'image'; // default
+    if (req.file.mimetype.startsWith('video/')) {
+      resourceType = 'video';
+    }
+
+    // Upload to Cloudinary
     const uploadStream = () => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: 'guardians-paws',
-            transformation: [{ width: 800, height: 800, crop: 'limit' }],
+            resource_type: resourceType,
+            transformation: [
+              { width: 800, height: 800, crop: 'limit' },
+              { quality: 'auto' }
+            ],
+            timeout: 120000 // 120 seconds
           },
           (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
+            if (error) {
+              console.error('Cloudinary error:', error);
+              reject(error);
+            } else {
+              resolve(result);
+            }
           }
         );
         streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -33,8 +51,11 @@ const uploadImage = async (req, res) => {
     });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ success: false, error: 'Upload failed' });
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Upload failed' 
+    });
   }
 };
 
-module.exports = { uploadImage };
+module.exports = { uploadMedia };
