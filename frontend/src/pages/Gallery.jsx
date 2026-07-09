@@ -57,7 +57,7 @@ const Gallery = () => {
 
       {/* ===== HEADER ===== */}
       <div className="text-center mb-12 sm:mb-16">
-        <div className="inline-block bg-navy-50 rounded-full px-4 sm:px-6 py-2 border border-navy-200 mb-4">
+        <div className="inline-block bg-gradient-to-r from-navy-50 to-sky-50 rounded-full px-4 sm:px-6 py-2 border border-navy-200 mb-4">
           <span className="text-xs sm:text-sm font-semibold text-navy-600">🐕 OUR RESCUES</span>
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-navy-700 mb-4">
@@ -71,7 +71,7 @@ const Gallery = () => {
       {/* ===== ADMIN CONTROLS ===== */}
       {isAuthenticated && isAdmin && (
         <div className="mb-8 sm:mb-12">
-          <div className="bg-white shadow-md border border-navy-200 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-navy-50 to-sky-50 shadow-md border border-navy-200 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-navy-100 flex items-center justify-center">
                 <span className="text-base sm:text-lg">🔐</span>
@@ -83,7 +83,7 @@ const Gallery = () => {
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="w-full sm:w-auto px-6 py-2.5 bg-navy-700 text-white font-bold rounded-xl hover:bg-navy-800 transition-all duration-300 shadow-md hover:shadow-lg text-sm sm:text-base"
+              className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-navy-700 to-navy-800 text-white font-bold rounded-xl hover:from-navy-800 hover:to-navy-900 transition-all duration-300 shadow-md hover:shadow-lg text-sm sm:text-base transform hover:scale-105"
             >
               + Add New Animal
             </button>
@@ -93,7 +93,7 @@ const Gallery = () => {
 
       {/* ===== STATS ===== */}
       <div className="text-center mb-8 sm:mb-10">
-        <div className="inline-block bg-navy-50 rounded-full px-4 sm:px-6 py-2 border border-navy-200">
+        <div className="inline-block bg-gradient-to-r from-navy-50 to-sky-50 rounded-full px-4 sm:px-6 py-2 border border-navy-200">
           <span className="text-xs sm:text-sm font-semibold text-navy-600">
             🐾 {animals.length} {animals.length === 1 ? 'Animal' : 'Animals'} in Our Care
           </span>
@@ -102,14 +102,14 @@ const Gallery = () => {
 
       {/* ===== ANIMALS GRID ===== */}
       {animals.length === 0 ? (
-        <div className="text-center py-16 sm:py-20">
+        <div className="text-center py-16 sm:py-20 bg-gradient-to-b from-white to-navy-50 rounded-3xl border border-navy-100">
           <div className="text-6xl sm:text-8xl mb-4 sm:mb-6 animate-bounce">🐾</div>
           <h2 className="text-2xl sm:text-3xl font-bold text-navy-600 mb-3">No rescues yet</h2>
           <p className="text-navy-400">Check back soon for our furry friends!</p>
           {isAuthenticated && isAdmin && (
             <button
               onClick={() => setShowModal(true)}
-              className="mt-6 px-6 sm:px-8 py-2.5 sm:py-3 bg-navy-700 text-white font-bold rounded-xl hover:bg-navy-800 transition-all duration-300 shadow-md hover:shadow-lg"
+              className="mt-6 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-navy-700 to-navy-800 text-white font-bold rounded-xl hover:from-navy-800 hover:to-navy-900 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             >
               + Add Your First Rescue
             </button>
@@ -120,18 +120,49 @@ const Gallery = () => {
           {animals.map((animal) => (
             <div
               key={animal._id}
-              className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-navy-100 hover:border-navy-300 overflow-hidden"
+              className="group bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-500 border border-navy-100 hover:border-navy-300 overflow-hidden transform hover:-translate-y-1"
             >
-              {/* Image */}
-              <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-navy-50">
-                <img
-                  src={animal.imageUrl}
-                  alt={animal.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = 'https://placehold.co/400x400?text=🐾+No+Image';
-                  }}
-                />
+              {/* Media Container */}
+              <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-gradient-to-br from-navy-50 to-sky-50">
+                {animal.mediaType === 'video' ? (
+                  <video
+                    src={animal.imageUrl}
+                    controls
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                ) : (
+                  <img
+                    src={animal.imageUrl}
+                    alt={animal.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    onError={(e) => {
+                      e.target.src = 'https://placehold.co/400x400?text=🐾+No+Image';
+                    }}
+                  />
+                )}
+
+                {/* Video Play Icon Overlay */}
+                {animal.mediaType === 'video' && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black/50 backdrop-blur-sm rounded-full p-3 sm:p-4 shadow-xl transform group-hover:scale-110 transition-all duration-300">
+                      <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+
+                {/* Media Type Badge */}
+                <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
+                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold backdrop-blur-sm ${
+                    animal.mediaType === 'video' 
+                      ? 'bg-purple-500 text-white' 
+                      : 'bg-sky-500 text-white'
+                  }`}>
+                    {animal.mediaType === 'video' ? '🎬 Video' : '📸 Photo'}
+                  </span>
+                </div>
+
                 {/* Status Badge */}
                 <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                   <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold shadow-md backdrop-blur-sm ${
@@ -146,12 +177,16 @@ const Gallery = () => {
                      '❤️ In Care'}
                   </span>
                 </div>
+
                 {/* Type Badge */}
                 <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3">
                   <span className="bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold text-navy-700 shadow-md">
                     {animal.type === 'dog' ? '🐕 Dog' : animal.type === 'cat' ? '🐈 Cat' : '🐾 Other'}
                   </span>
                 </div>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
 
               {/* Content */}
@@ -164,7 +199,7 @@ const Gallery = () => {
                     <button
                       onClick={() => handleDelete(animal._id)}
                       disabled={deletingId === animal._id}
-                      className="p-1 rounded-lg text-navy-300 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+                      className="p-1.5 rounded-lg text-navy-300 hover:text-red-600 hover:bg-red-50 transition-all duration-200 group-hover:opacity-100 opacity-0"
                       title="Delete"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -180,7 +215,9 @@ const Gallery = () => {
                   {animal.story}
                 </p>
                 <div className="mt-3 pt-3 border-t border-navy-100 flex items-center justify-between text-[10px] sm:text-xs text-navy-400">
-                  <span>🐾 Rescued with love</span>
+                  <span className="flex items-center gap-1">
+                    <span>🐾</span> Rescued with love
+                  </span>
                   <span>{new Date(animal.createdAt).toLocaleDateString('en-BD')}</span>
                 </div>
               </div>
