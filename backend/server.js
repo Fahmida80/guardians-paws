@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -10,32 +9,51 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://www.gpcbd.org',
+  'https://gpcbd.org',
+  'https://guardians-paws-lilac.vercel.app'
+];
+
+// ===== CORS CONFIGURATION =====
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+// Manual CORS headers (backup for preflight)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-auth-token');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// ===== SOCKET.IO =====
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:5000',
-      'https://www.gpcbd.org',
-      'https://gpcbd.org',
-      'https://guardians-paws-lilac.vercel.app'
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
 // Middleware
-// app.use(cors());
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'https://www.gpcbd.org',
-    'https://gpcbd.org',
-    'https://guardians-paws-lilac.vercel.app'
-  ],
-  credentials: true,
-}));
 app.use(express.json());
 
 // ===== DATABASE CONNECTIONS =====
@@ -73,7 +91,6 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('🟢 New client connected:', socket.id);
 
-  // Send initial summary when client connects
   const sendSummary = async () => {
     try {
       const conn = app.get('trackingConnection');
@@ -105,12 +122,10 @@ io.on('connection', (socket) => {
 
   sendSummary();
 
-  // Listen for new transaction events (from tracking app)
   socket.on('new-transaction', () => {
     sendSummary();
   });
 
-  // Listen for transaction updates
   socket.on('transaction-updated', () => {
     sendSummary();
   });
